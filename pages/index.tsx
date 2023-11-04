@@ -1,21 +1,16 @@
+import Status from '@/components/StatusFilter';
+import NFTView from '@/view/NFTView';
 import Head from 'next/head';
 import { useState } from 'react';
 
-import Status from '@/components/StatusFilter';
-import Tabs from '@/components/Tabs';
-import TabContent from '@/components/TabContent';
-
-import NFTView from '@/view/NFTView';
-
-const COLLECTION_TABS = [
+const TABINFORM = [
   { idx: 0, name: 'NFT', content: <NFTView /> },
   { idx: 1, name: '컬렉션 정보', content: '컬렉션 정보의 내용' },
   { idx: 2, name: '액티비티', content: '액티비티의 내용' },
 ];
 
 export default function Home() {
-  const [tabIndex, setTabIndex] = useState(0);
-
+  const [tabIndex, setTabIndex] = useState<number>(0);
   return (
     <>
       <Head>
@@ -24,8 +19,23 @@ export default function Home() {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Tabs tabs={COLLECTION_TABS} setTabIndex={setTabIndex} />
-      <TabContent content={COLLECTION_TABS[tabIndex].content} />
+
+      <ul style={{ display: 'flex', listStyleType: 'none' }}>
+        {TABINFORM.map((ele) => {
+          return (
+            <li
+              style={{ outline: '1px solid red', padding: '10px' }}
+              key={ele.idx}
+              onClick={() => {
+                setTabIndex(ele.idx);
+              }}
+            >
+              {ele.name}
+            </li>
+          );
+        })}
+      </ul>
+      <div>{TABINFORM[tabIndex].content}</div>
     </>
   );
 }
