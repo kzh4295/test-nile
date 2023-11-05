@@ -1,6 +1,6 @@
 import { ChangeEvent, useReducer } from 'react';
 
-const STATUS_FILTERS: StatusFilters = [
+const STATUS_FILTERS: StatusFilter[] = [
   { id: 0, title: '최초 판매중', value: 'nowOffering' },
   { id: 1, title: '판매중', value: 'onMarket' },
   { id: 2, title: '제안 가능', value: 'openForOffers' },
@@ -13,7 +13,6 @@ interface StatusFilter {
   title: string;
   value: string;
 }
-type StatusFilters = StatusFilter[];
 
 interface StatusAction {
   type: string;

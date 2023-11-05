@@ -39,7 +39,7 @@ export default function FilterContents({
           }
           onChange={handleChange}
         >
-          {selectQuery.map(({ id, name }: SelectOption) => (
+          {selectQuery.map(({ id, name }) => (
             <option key={id} value={name}>
               {name}
             </option>
@@ -47,7 +47,7 @@ export default function FilterContents({
         </select>
       </div>
 
-      {list.map(({ name }: NFTItem, idx) => (
+      {list.map(({ name }, idx) => (
         <div key={idx}>{name}</div>
       ))}
     </>

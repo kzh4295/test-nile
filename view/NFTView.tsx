@@ -58,7 +58,7 @@ export interface Options {
   page: number;
   fromPrice?: string;
   toPrice?: string;
-  'orderStatuses[]': [];
+  'orderStatuses[]': string[];
   sort: string;
   slug: string;
 }
@@ -147,7 +147,7 @@ export default function NFTView() {
       fromPrice: fromPrice,
       toPrice: toPrice,
     }));
-    fetchData(filterOptions);
+    // fetchData(filterOptions);
   };
 
   const handleChecks = (status: string) => {
@@ -166,7 +166,7 @@ export default function NFTView() {
         'orderStatuses[]': [...prevOptions['orderStatuses[]'], status],
       };
     });
-    fetchData(filterOptions);
+    // fetchData(filterOptions);
   };
 
   return (
