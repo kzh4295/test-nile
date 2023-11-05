@@ -1,9 +1,9 @@
-import Status from '@/components/StatusFilter';
-import NFTView from '@/view/NFTView';
-import Head from 'next/head';
 import { useState } from 'react';
+import Head from 'next/head';
 
-const TABINFORM = [
+import NFTView from '@/view/NFTView';
+
+const TABINFORMS = [
   { idx: 0, name: 'NFT', content: <NFTView /> },
   { idx: 1, name: '컬렉션 정보', content: '컬렉션 정보의 내용' },
   { idx: 2, name: '액티비티', content: '액티비티의 내용' },
@@ -21,21 +21,21 @@ export default function Home() {
       </Head>
 
       <ul style={{ display: 'flex', listStyleType: 'none' }}>
-        {TABINFORM.map((ele) => {
+        {TABINFORMS.map(({ idx, name }: any) => {
           return (
             <li
               style={{ outline: '1px solid red', padding: '10px' }}
-              key={ele.idx}
+              key={idx}
               onClick={() => {
-                setTabIndex(ele.idx);
+                setTabIndex(idx);
               }}
             >
-              {ele.name}
+              {name}
             </li>
           );
         })}
       </ul>
-      <div>{TABINFORM[tabIndex].content}</div>
+      <div>{TABINFORMS[tabIndex].content}</div>
     </>
   );
 }
