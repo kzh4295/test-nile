@@ -1,58 +1,61 @@
 import { useReducer } from 'react';
 
-const StatusFilterArray = [
-  { id: 0, title: '최초 판매중', checked: false },
-  { id: 1, title: '판매중', checked: false },
-  { id: 2, title: '제안 가능', checked: false },
-  { id: 3, title: '옥션 종료', checked: false },
-  { id: 4, title: '판매 예정', checked: false },
+const STATUS_FILTERS: StatusFilters = [
+  { id: 0, title: '최초 판매중', value: 'nowOffering' },
+  { id: 1, title: '판매중', value: 'onMarket' },
+  { id: 2, title: '제안 가능', value: 'openForOffers' },
+  { id: 3, title: '옥션 종료', value: 'auctionClosed' },
+  { id: 4, title: '판매 예정', value: 'upComing' },
 ];
 
-interface StateType {
+interface StatusFilter {
   id: number;
   title: string;
-  checked: boolean;
+  value: string;
 }
+type StatusFilters = StatusFilter[];
 
-interface Action {
+interface StatusAction {
   type: string;
   id: number;
 }
 
-const reducer = (statusState: StateType[], action: Action) => {
+const reducer = (statusFilterStates: StatusFilter[], action: StatusAction) => {
   switch (action.type) {
     case 'toggle':
-      return statusState.map((item: StateType) => {
-        if (item.id === action.id) {
+      return statusFilterStates.map((statusFilterState: StatusFilter) => {
+        if (statusFilterState.id === action.id) {
           return {
-            ...item,
-            checked: !item.checked,
+            ...statusFilterState,
           };
         }
-        return item;
+        return statusFilterState;
       });
     default:
-      return statusState;
+      return statusFilterStates;
   }
 };
 
 function StatusFilter() {
-  const [statusState, dispatch] = useReducer(reducer, StatusFilterArray);
-  console.log(statusState);
+  const [statusFilterStates, dispatch] = useReducer(reducer, STATUS_FILTERS);
+  console.log(statusFilterStates);
   return (
-    <div>
-      {statusState.map((ele) => (
-        <div key={ele.id}>
-          <input
-            type='checkbox'
-            name={ele.title}
-            checked={ele.checked}
-            onChange={() => dispatch({ type: 'toggle', id: ele.id })}
-          />
-          {ele.title}
-        </div>
+    <ul>
+      {statusFilterStates.map((statusFilterState) => (
+        <li key={statusFilterState.id}>
+          <label>
+            <input
+              type='checkbox'
+              value={statusFilterState.value}
+              onChange={() =>
+                dispatch({ type: 'toggle', id: statusFilterState.id })
+              }
+            />
+            {statusFilterState.title}
+          </label>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 
