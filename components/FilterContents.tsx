@@ -1,86 +1,44 @@
-import { Nft, useCollectionNftTokens } from '@/hooks/useCollectionNftTokens';
-import { ChangeEvent, useState } from 'react';
-
-const SORT_OPTIONS = [
-  {
-    id: 0,
-    name: 'highestBid',
-  },
-  {
-    id: 1,
-    name: 'lowestBid',
-  },
-  {
-    id: 2,
-    name: 'recentlyActive',
-  },
-  {
-    id: 3,
-    name: 'recentlyListed',
-  },
-  {
-    id: 4,
-    name: 'highestLastSale',
-  },
-  {
-    id: 5,
-    name: 'lowestLastSale',
-  },
-  {
-    id: 6,
-    name: 'endingSoon',
-  },
-  {
-    id: 7,
-    name: 'mostViewed',
-  },
-];
-
-export const DEFAULT_SORT_OPTION = {
-  id: 2,
-  name: 'recentlyActive',
-};
-
-export interface SelectOption {
-  id: number;
-  name: string;
-}
+import { SelectOption } from '@/view/NFTView';
 
 interface FilterContentsProps {
-  nftTokens: Nft[];
+  list: string[];
+  selectQuery: SelectOption[];
+  setSelectQuery: (param: SelectOption[]) => void;
 }
 
-function FilterContents({ nftTokens }: FilterContentsProps) {
-  const [currentSortOption, setCurrentSortOption] =
-    useState(DEFAULT_SORT_OPTION);
-
-  const handleSelectValueChange = (e: ChangeEvent<HTMLSelectElement>) => {
+function FilterContents({
+  list,
+  selectQuery,
+  setSelectQuery,
+}: FilterContentsProps) {
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-
-    const sortOption = SORT_OPTIONS.find(
-      (selectOption) => selectOption.name === value
-    );
-
-    setCurrentSortOption(sortOption!);
+    const updatedSelectQuery = selectQuery.map((item) => ({
+      ...item,
+      checked: item.name === value,
+    }));
+    setSelectQuery(updatedSelectQuery);
   };
 
   return (
     <>
       <div style={{ width: '500px' }}>
         <select
-          value={currentSortOption.name}
-          onChange={handleSelectValueChange}
+          value={
+            selectQuery.find((item) => item.checked)?.name || 'recentlyActive'
+          }
+          onChange={handleChange}
         >
-          {SORT_OPTIONS.map(({ id, name }) => (
-            <option key={id} value={name}>
-              {name}
+          {selectQuery.map((ele) => (
+            <option key={ele.id} value={ele.name}>
+              {ele.name}
             </option>
           ))}
         </select>
       </div>
 
-      {nftTokens.map(({ name }) => (
-        <div key={name}>{name}</div>
+      {list.map((ele, idx) => (
+        <div key={idx}>{JSON.stringify(ele)}</div>
       ))}
     </>
   );

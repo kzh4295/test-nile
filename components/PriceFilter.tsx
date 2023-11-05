@@ -1,28 +1,16 @@
-import { ChangeEvent, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface PriceFilterProps {
-  setPriceOption: (min: number, max: number) => void;
+  handleApplyClick: (min: number, max: number ) => void;
 }
 
-export default function PriceFilter({ setPriceOption }: PriceFilterProps) {
+function PriceFilter({ handleApplyClick }: PriceFilterProps) {
   const [min, setMin] = useState(0);
   const [max, setMax] = useState(0);
 
-  const handleApplyClick = () => {
-    setPriceOption(min, max);
-  };
-
-  const handleMinChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.valueAsNumber < 0) {
-      return;
-    }
-
-    setMin(e.target.valueAsNumber);
-  };
-
-  const handleMaxChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setMax(e.target.valueAsNumber);
-  };
+  useEffect(() => {
+    console.log('min', min, 'max', max);
+  }, [min, max]);
 
   return (
     <>
@@ -31,20 +19,24 @@ export default function PriceFilter({ setPriceOption }: PriceFilterProps) {
           type='number'
           placeholder='최소'
           value={min}
-          onChange={handleMinChange}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setMin(e.target.valueAsNumber);
+          }}
         />
         <input
           type='number'
           placeholder='최대'
           value={max}
-          onChange={handleMaxChange}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setMax(e.target.valueAsNumber);
+          }}
         />
       </div>
 
       <br />
-      <button type='button' onClick={handleApplyClick}>
-        적용
-      </button>
+      <button onClick={() => handleApplyClick(min, max)}>적용</button>
     </>
   );
 }
+
+export default PriceFilter;
