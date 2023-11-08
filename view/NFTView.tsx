@@ -147,7 +147,6 @@ export default function NFTView() {
       fromPrice: fromPrice,
       toPrice: toPrice,
     }));
-    // fetchData(filterOptions);
   };
 
   const handleChecks = (status: string) => {
@@ -166,7 +165,6 @@ export default function NFTView() {
         'orderStatuses[]': [...prevOptions['orderStatuses[]'], status],
       };
     });
-    // fetchData(filterOptions);
   };
 
   return (
