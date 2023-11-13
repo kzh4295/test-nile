@@ -97,9 +97,9 @@ export default function NFTView() {
         const refinedCollection = items.map(
           ({ imageUrl, name, amount, status }: NFTItem) => ({
             image: imageUrl,
-            name: name,
-            amount: amount,
-            status: status,
+            name,
+            amount,
+            status,
           })
         );
         setList(refinedCollection);
@@ -115,24 +115,14 @@ export default function NFTView() {
     const selectedQuery = selectQuery.find((item) => item.checked);
 
     if (selectedQuery) {
-      let updatedFilterOptions = {
+      const updatedFilterOptions = {
         ...filterOptions,
-        sort: selectedQuery.name,
-      };
-
-      if (filterOptions.fromPrice > 0) {
-        updatedFilterOptions = {
-          ...updatedFilterOptions,
+        ...(selectedQuery && { sort: selectedQuery.name }),
+        ...(filterOptions.fromPrice > 0 && {
           fromPrice: filterOptions.fromPrice,
-        };
-      }
-
-      if (filterOptions.toPrice > 0) {
-        updatedFilterOptions = {
-          ...updatedFilterOptions,
-          toPrice: filterOptions.toPrice,
-        };
-      }
+        }),
+        ...(filterOptions.toPrice > 0 && { toPrice: filterOptions.toPrice }),
+      };
 
       fetchData(updatedFilterOptions);
     }
@@ -144,12 +134,12 @@ export default function NFTView() {
 
     setFilterOptions((prevFilter) => ({
       ...prevFilter,
-      fromPrice: fromPrice,
-      toPrice: toPrice,
+      fromPrice,
+      toPrice,
     }));
   };
 
-  const handleChecks = (status: string) => {
+  const handleApplyStatusFilterCheck = (status: string) => {
     setFilterOptions((prevOptions: any) => {
       if (prevOptions['orderStatuses[]'].includes(status)) {
         return {
@@ -171,13 +161,15 @@ export default function NFTView() {
     <>
       <div style={{ display: 'flex' }}>
         <div>
-          <StatusFilter handleChecks={handleChecks} />
+          <StatusFilter
+            handleApplyStatusFilterCheck={handleApplyStatusFilterCheck}
+          />
           <br />
           <br />
           <hr />
           <br />
           <br />
-          <PriceFilter handleApplyClick={handleApplyClick} />
+          <PriceFilter handleApplyPriceFilterClick={handleApplyClick} />
         </div>
         <div>
           <FilterContents
