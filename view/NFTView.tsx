@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { toWei } from 'web3-utils';
 
 import FilterContents from '@/components/FilterContents';
 import PriceFilter from '@/components/PriceFilter';
@@ -53,24 +54,29 @@ export interface SelectOption {
   name: string;
   checked: boolean;
 }
-
 export interface Options {
   page: number;
-  fromPrice: number;
-  toPrice: number;
-  'orderStatuses[]': [];
+  fromPrice?: string;
+  toPrice?: string;
+  'orderStatuses[]': string[];
   sort: string;
   slug: string;
 }
+interface NFTItem {
+  imageUrl: string;
+  name: string;
+  amount: number;
+  status: string;
+}
 
-function NFTView() {
+export default function NFTView() {
   const [selectQuery, setSelectQuery] =
     useState<SelectOption[]>(FILTER_CONTENTS);
-  const [list, setList] = useState([]);
+  const [list, setList] = useState<NFTItem[]>([]);
   const [filterOptions, setFilterOptions] = useState<Options>({
     slug: 'COOS',
-    fromPrice: 0,
-    toPrice: 0,
+    // fromPrice: 0,
+    // toPrice: 0,
     'orderStatuses[]': [],
     page: 1,
     sort: 'recentlyActive',
@@ -88,13 +94,15 @@ function NFTView() {
       const items = response.data.data?.items;
 
       if (items) {
-        const tt = items.map((ele: any) => ({
-          image: ele.imageUrl,
-          name: ele.name,
-          amount: ele.amount,
-          status: ele.status,
-        }));
-        setList(tt);
+        const refinedCollection = items.map(
+          ({ imageUrl, name, amount, status }: NFTItem) => ({
+            image: imageUrl,
+            name: name,
+            amount: amount,
+            status: status,
+          })
+        );
+        setList(refinedCollection);
       } else {
         console.log('Items data is null or undefined.');
       }
@@ -107,21 +115,63 @@ function NFTView() {
     const selectedQuery = selectQuery.find((item) => item.checked);
 
     if (selectedQuery) {
-      setFilterOptions({ ...filterOptions, sort: selectedQuery.name });
-      // fetchData(filterOptions);
+      let updatedFilterOptions = {
+        ...filterOptions,
+        sort: selectedQuery.name,
+      };
+
+      if (filterOptions.fromPrice > 0) {
+        updatedFilterOptions = {
+          ...updatedFilterOptions,
+          fromPrice: filterOptions.fromPrice,
+        };
+      }
+
+      if (filterOptions.toPrice > 0) {
+        updatedFilterOptions = {
+          ...updatedFilterOptions,
+          toPrice: filterOptions.toPrice,
+        };
+      }
+
+      fetchData(updatedFilterOptions);
     }
   }, [selectQuery, filterOptions]);
 
   const handleApplyClick = (min: number, max: number) => {
-    setFilterOptions({ ...filterOptions, fromPrice: min, toPrice: max });
-    // fetchData(filterOptions);
+    const fromPrice = toWei(String(min));
+    const toPrice = toWei(String(max));
+
+    setFilterOptions((prevFilter) => ({
+      ...prevFilter,
+      fromPrice: fromPrice,
+      toPrice: toPrice,
+    }));
+  };
+
+  const handleChecks = (status: string) => {
+    setFilterOptions((prevOptions: any) => {
+      if (prevOptions['orderStatuses[]'].includes(status)) {
+        return {
+          ...prevOptions,
+          'orderStatuses[]': prevOptions['orderStatuses[]'].filter(
+            (orderStatus: any) => orderStatus !== status
+          ),
+        };
+      }
+
+      return {
+        ...prevOptions,
+        'orderStatuses[]': [...prevOptions['orderStatuses[]'], status],
+      };
+    });
   };
 
   return (
     <>
       <div style={{ display: 'flex' }}>
         <div>
-          <StatusFilter />
+          <StatusFilter handleChecks={handleChecks} />
           <br />
           <br />
           <hr />
@@ -140,5 +190,3 @@ function NFTView() {
     </>
   );
 }
-
-export default NFTView;

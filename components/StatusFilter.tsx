@@ -1,6 +1,6 @@
-import { useReducer } from 'react';
+import { ChangeEvent, useReducer } from 'react';
 
-const STATUS_FILTERS: StatusFilters = [
+const STATUS_FILTERS: StatusFilter[] = [
   { id: 0, title: '최초 판매중', value: 'nowOffering' },
   { id: 1, title: '판매중', value: 'onMarket' },
   { id: 2, title: '제안 가능', value: 'openForOffers' },
@@ -13,13 +13,15 @@ interface StatusFilter {
   title: string;
   value: string;
 }
-type StatusFilters = StatusFilter[];
 
 interface StatusAction {
   type: string;
   id: number;
 }
 
+interface StatusFilterProps {
+  handleChecks: (value: string) => void;
+}
 const reducer = (statusFilterStates: StatusFilter[], action: StatusAction) => {
   switch (action.type) {
     case 'toggle':
@@ -36,27 +38,28 @@ const reducer = (statusFilterStates: StatusFilter[], action: StatusAction) => {
   }
 };
 
-function StatusFilter() {
+export default function StatusFilter({ handleChecks }: StatusFilterProps) {
   const [statusFilterStates, dispatch] = useReducer(reducer, STATUS_FILTERS);
-  console.log(statusFilterStates);
+  const handleCheck = (id: number, e: ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    dispatch({ type: 'toggle', id });
+    handleChecks(value);
+  };
+
   return (
     <ul>
-      {statusFilterStates.map((statusFilterState) => (
-        <li key={statusFilterState.id}>
+      {statusFilterStates.map(({ id, value, title }) => (
+        <li key={id}>
           <label>
             <input
               type='checkbox'
-              value={statusFilterState.value}
-              onChange={() =>
-                dispatch({ type: 'toggle', id: statusFilterState.id })
-              }
+              value={value}
+              onChange={(e) => handleCheck(id, e)}
             />
-            {statusFilterState.title}
+            {title}
           </label>
         </li>
       ))}
     </ul>
   );
 }
-
-export default StatusFilter;

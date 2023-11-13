@@ -1,12 +1,22 @@
-import { SelectOption } from '@/view/NFTView';
-
-interface FilterContentsProps {
-  list: string[];
-  selectQuery: SelectOption[];
-  setSelectQuery: (param: SelectOption[]) => void;
+interface NFTItem {
+  imageUrl: string;
+  name: string;
+  amount: number;
+  status: string;
+}
+export interface SelectOption {
+  id: number;
+  name: string;
+  checked: boolean;
 }
 
-function FilterContents({
+interface FilterContentsProps {
+  list: NFTItem[];
+  selectQuery: SelectOption[];
+  setSelectQuery: (query: SelectOption[]) => void;
+}
+
+export default function FilterContents({
   list,
   selectQuery,
   setSelectQuery,
@@ -29,19 +39,17 @@ function FilterContents({
           }
           onChange={handleChange}
         >
-          {selectQuery.map((ele) => (
-            <option key={ele.id} value={ele.name}>
-              {ele.name}
+          {selectQuery.map(({ id, name }) => (
+            <option key={id} value={name}>
+              {name}
             </option>
           ))}
         </select>
       </div>
 
-      {list.map((ele, idx) => (
-        <div key={idx}>{JSON.stringify(ele)}</div>
+      {list.map(({ name }, idx) => (
+        <div key={idx}>{name}</div>
       ))}
     </>
   );
 }
-
-export default FilterContents;

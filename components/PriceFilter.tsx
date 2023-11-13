@@ -1,16 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface PriceFilterProps {
-  handleApplyClick: (min: number, max: number ) => void;
+  handleApplyClick: (min: number, max: number) => void;
 }
 
-function PriceFilter({ handleApplyClick }: PriceFilterProps) {
+export default function PriceFilter({ handleApplyClick }: PriceFilterProps) {
   const [min, setMin] = useState(0);
   const [max, setMax] = useState(0);
-
-  useEffect(() => {
-    console.log('min', min, 'max', max);
-  }, [min, max]);
 
   return (
     <>
@@ -38,5 +34,3 @@ function PriceFilter({ handleApplyClick }: PriceFilterProps) {
     </>
   );
 }
-
-export default PriceFilter;
