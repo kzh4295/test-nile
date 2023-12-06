@@ -5,6 +5,7 @@ import { toWei } from 'web3-utils';
 import FilterContents from '@/components/FilterContents';
 import PriceFilter from '@/components/PriceFilter';
 import StatusFilter from '@/components/StatusFilter';
+import {useQuery} from "@tanstack/react-query";
 
 const FILTER_CONTENTS = [
   {
@@ -68,65 +69,48 @@ interface NFTItem {
   amount: number;
   status: string;
 }
-
 export default function NFTView() {
-  const [selectQuery, setSelectQuery] =
-    useState<SelectOption[]>(FILTER_CONTENTS);
+  const [selectQuery, setSelectQuery] = useState<SelectOption[]>(FILTER_CONTENTS);
   const [list, setList] = useState<NFTItem[]>([]);
   const [filterOptions, setFilterOptions] = useState<Options>({
-    slug: 'COOS',
-    // fromPrice: 0,
-    // toPrice: 0,
+    slug: 'BAGC',
     'orderStatuses[]': [],
     page: 1,
     sort: 'recentlyActive',
   });
 
-  async function fetchData(param: Options) {
-    try {
-      const response = await axios.get(
-        `https://api.nile.io/nft/collections/tokens`,
-        {
-          params: param,
-        }
-      );
+  const { data: refinedCollection, isLoading, isError } = useQuery({
+    queryKey: ['nftData', filterOptions], // 쿼리 키에 filterOptions를 추가
+    queryFn: async () => {
+      try {
+        const response = await axios.get(
+            'https://api.nile.io/nft/collections/tokens',
+            {
+              params: filterOptions,
+            }
+        );
 
-      const items = response.data.data?.items;
+        const items = response.data.data?.items;
 
-      if (items) {
-        const refinedCollection = items.map(
-          ({ imageUrl, name, amount, status }: NFTItem) => ({
+        if (items) {
+          const refinedCollection = items.map(({ imageUrl, name, amount, status }: NFTItem) => ({
             image: imageUrl,
             name,
             amount,
             status,
-          })
-        );
-        setList(refinedCollection);
-      } else {
-        console.log('Items data is null or undefined.');
+          }));
+          setList(refinedCollection);
+          return refinedCollection; // Make sure to return the data
+        } else {
+          console.log('Items data is null or undefined.');
+          return null; // Return a meaningful value in case of no data
+        }
+      } catch (error) {
+        console.error(error);
+        throw error; // Rethrow the error to be caught by React Query
       }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  useEffect(() => {
-    const selectedQuery = selectQuery.find((item) => item.checked);
-
-    if (selectedQuery) {
-      const updatedFilterOptions = {
-        ...filterOptions,
-        ...(selectedQuery && { sort: selectedQuery.name }),
-        ...(filterOptions.fromPrice > 0 && {
-          fromPrice: filterOptions.fromPrice,
-        }),
-        ...(filterOptions.toPrice > 0 && { toPrice: filterOptions.toPrice }),
-      };
-
-      fetchData(updatedFilterOptions);
-    }
-  }, [selectQuery, filterOptions]);
+    },
+  });
 
   const handleApplyClick = (min: number, max: number) => {
     const fromPrice = toWei(String(min));
@@ -145,7 +129,7 @@ export default function NFTView() {
         return {
           ...prevOptions,
           'orderStatuses[]': prevOptions['orderStatuses[]'].filter(
-            (orderStatus: any) => orderStatus !== status
+              (orderStatus: any) => orderStatus !== status
           ),
         };
       }
@@ -157,10 +141,13 @@ export default function NFTView() {
     });
   };
 
+
   return (
     <>
       <div style={{ display: 'flex' }}>
         <div>
+          {isLoading && <p>Loading...</p>}
+          {isError && <p>Error occurred while fetching data</p>}
           <StatusFilter
             handleApplyStatusFilterCheck={handleApplyStatusFilterCheck}
           />
