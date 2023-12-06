@@ -20,12 +20,12 @@ interface StatusAction {
 }
 
 interface StatusFilterProps {
-  handleChecks: (value: string) => void;
+  handleApplyStatusFilterCheck: (value: string) => void;
 }
-const reducer = (statusFilterStates: StatusFilter[], action: StatusAction) => {
+const reducer = (statusFilterState: StatusFilter[], action: StatusAction) => {
   switch (action.type) {
     case 'toggle':
-      return statusFilterStates.map((statusFilterState: StatusFilter) => {
+      return statusFilterState.map((statusFilterState: StatusFilter) => {
         if (statusFilterState.id === action.id) {
           return {
             ...statusFilterState,
@@ -34,21 +34,21 @@ const reducer = (statusFilterStates: StatusFilter[], action: StatusAction) => {
         return statusFilterState;
       });
     default:
-      return statusFilterStates;
+      return statusFilterState;
   }
 };
 
-export default function StatusFilter({ handleChecks }: StatusFilterProps) {
-  const [statusFilterStates, dispatch] = useReducer(reducer, STATUS_FILTERS);
+export default function StatusFilter({ handleApplyStatusFilterCheck }: StatusFilterProps) {
+  const [statusFilterState, dispatch] = useReducer(reducer, STATUS_FILTERS);
   const handleCheck = (id: number, e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     dispatch({ type: 'toggle', id });
-    handleChecks(value);
+    handleApplyStatusFilterCheck(value);
   };
 
   return (
     <ul>
-      {statusFilterStates.map(({ id, value, title }) => (
+      {statusFilterState.map(({ id, value, title }) => (
         <li key={id}>
           <label>
             <input
